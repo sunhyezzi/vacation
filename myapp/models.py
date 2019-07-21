@@ -11,3 +11,4 @@ class Myapp(models.Model):
     
     def summary(self):
         return self.body[:50]
+

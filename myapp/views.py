@@ -5,6 +5,9 @@ from .models import Myapp
 
 # Create your views here.
 
+def home(request): 
+    return render(request, 'home.html')
+
 def index(request):
     myapps =Myapp.objects #쿼리셋
     return render(request, 'index.html', {'myapps':myapps})
