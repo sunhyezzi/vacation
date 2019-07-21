@@ -21,7 +21,4 @@ class Comment(models.Model):
     class Meta:
         ordering = ['-id']
 
-    def __str__(self):
-        return (self.author.username if self.author else "무명")+ "의 댓글"
-
 
