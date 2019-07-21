@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
-from .models import Myapp
+from .models import Myapp, Comment
+from .forms import CommentForm
 
 
 # Create your views here.
@@ -31,3 +32,19 @@ def delete(request, pk):
         myapp = Myapp.objects.get(id=pk)
         myapp.delete()
         return redirect('index')
+
+
+def comment(request, document_id):
+
+    if request.method == "POST":
+        comment_form = CommentForm(request.POST)
+        comment_form.instance.author_id = request.user.id
+        comment_form.instance.document_id = document_id
+        if comment_form.is_valid():
+            comment = comment_form.save()
+
+    return HttpResponseRedirect(reverse_lazy('board:detail', args=[document_id]))
+
+# get_absolute_url을 설정해 놓았을 시(in models)
+    def get_absolute_url(self):
+        return reverse('board:detail', args=[self.id])

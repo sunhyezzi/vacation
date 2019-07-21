@@ -28,4 +28,7 @@ urlpatterns = [
     path('myapp/create', myapp.views.create, name='create'),
     path('<int:pk>/delete/', myapp.views.delete, name='delete'),
     path('accounts/', include('accounts.urls')),
+    path('comment/<int:pk>', views.comment, name="comment"),
+    path('comment/<int:pk>/update/', views.comment_update, name="comment_update"),
+    path('comment/<int:pk>/delete/', views.comment_delete, name="comment_delete"),
 ]

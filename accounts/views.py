@@ -33,3 +33,4 @@ def logout(request):
         auth.logout(request)
         return redirect('home')
     return render(request, 'home.html')
+
