@@ -33,18 +33,18 @@ def delete(request, pk):
         myapp.delete()
         return redirect('index')
 
-
-def comment(request, document_id):
-
+def comment_write(request, post_pk):
     if request.method == "POST":
-        comment_form = CommentForm(request.POST)
-        comment_form.instance.author_id = request.user.id
-        comment_form.instance.document_id = document_id
-        if comment_form.is_valid():
-            comment = comment_form.save()
+        post = get_object_or_404(Post, pk=post_pk)
+        content = request.POST.get('content')
 
-    return HttpResponseRedirect(reverse_lazy('board:detail', args=[document_id]))
+        conn_user = request.user
+        conn_profile = Profile.objects.get(user=conn_user)
 
-# get_absolute_url을 설정해 놓았을 시(in models)
-    def get_absolute_url(self):
-        return reverse('board:detail', args=[self.id])
+        if not content:
+            messages.info(request, '님 아무것도 안 썼는디요' )
+            return HttpResponseRedirect(reverse_lazy('post:detail', post_pk))
+
+        Comment.objects.create(post=post, comment_writer=conn_profile, comment_contents=content)
+        return HttpResponseRedirect(reverse_lazy('myapp_index'))
+

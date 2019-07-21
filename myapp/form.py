@@ -1,14 +1,20 @@
-from .models import Document, Comment
+from django import forms
+from .models import Myapp, Comment
 
-class CommentForm(forms.ModelForm):
-    #text = forms.TextInput(label = '댓글')
+ class Create(forms.ModelForm):
+    class Meta:
+        model = Myapp
+        fields = ['title', 'body']
 
+ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ['text']
+        widgets = {
+            'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'cols': 40})
+        }
 
-    def __init__(self, *args, **kwargs):
+     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['text'].label = "댓글"
-
+        self.fields['text'].label = '댓글
         

@@ -146,27 +146,22 @@
     </div>
 </div>
 
-<form action="{ % url "board:comment" object.id % }" method="POST">
-  { % csrf_token % }
-  
-      
-      <input type="submit" value="Comment" class="btn btn-outline-primary">
-  
-  </form>
-  
-  <table class="table table-striped">
-      { % for comment in comments % }
-      <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td><a href="{ % url 'board:comment_delete' comment.id % }">삭제하기</a></td>
-          <td><a href="{ % url 'board:comment_update' comment.id % }">수정하기</a></td>
-      </tr>
+<hr>
+{ % for comment in post.comments.all % }
+  <div class="comment">
+    <div class="data">{{ comment.comment.date }}</div>
+    <p>{{ comment.comment_contents }} </p>
+  </div>
       { % endfor % }
-  </table>
 
-  
+<hr>
+  <form action="{% url 'comment_write' post_pk=post.pk %}" method="POST">
+    {% csrf_token %}
+    <input type="text" name="content" placeholder="Write your comments">
+    <input type="submit" value="Write"/>
+  </form>
+<hr>
+
 
 {% endfor %}
   </div><!-- /.row -->
