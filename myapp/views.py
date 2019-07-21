@@ -1,8 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from .models import Myapp, Comment
-from .forms import CommentForm
-
+from .forms import  Create, MyappCommentForm
+from django.http import HttpResponseRedirect
+from django import forms
 
 # Create your views here.
 
@@ -33,18 +34,39 @@ def delete(request, pk):
         myapp.delete()
         return redirect('index')
 
-def comment_write(request, post_pk):
-    if request.method == "POST":
-        post = get_object_or_404(Post, pk=post_pk)
-        content = request.POST.get('content')
 
-        conn_user = request.user
-        conn_profile = Profile.objects.get(user=conn_user)
+def comment(request, blog_id):
+    blog_detail = get_object_or_404(Myapp, pk = blog_id)
+    comments = Comment.objects.filter(blog_id=blog_id)
 
-        if not content:
-            messages.info(request, '님 아무것도 안 썼는디요' )
-            return HttpResponseRedirect(reverse_lazy('post:detail', post_pk))
+    if request.method == 'POST':
+        comment_form = MyappCommentForm(request.POST)
+        comment_form.instance.blog_id = blog_id
+        if comment_form.is_valid():
+            comment_form.save()
+  
+    else :
+        comment_form = MyappCommentForm()
 
-        Comment.objects.create(post=post, comment_writer=conn_profile, comment_contents=content)
-        return HttpResponseRedirect(reverse_lazy('myapp_index'))
+    context = {
+            'blog_detail' : blog_detail,
+            'comments': comments,
+            'comment_form': comment_form
+            
+    }
+    return render(request, 'myapp/index.html', context)
 
+def comment_delete(request, pk) :
+    comment = get_object_or_404(Comment, pk = pk)
+    comment.delete()
+    return redirect('home')
+
+def comment_update(request, pk):
+    comment = get_object_or_404(Comment, pk = pk)
+    form = MyappCommentForm(request.POST, instance = comment)
+
+    if form.is_valid():
+        form.save()
+        return redirect('home')
+
+    return render(request, 'myapp/comment.html', {'form' : form})
