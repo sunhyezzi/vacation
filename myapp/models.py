@@ -1,7 +1,6 @@
 from django.db import models
-from django.utils import timezone
-from django.conf import settings
 # Create your models here.
+
 class Myapp(models.Model):
     title = models.CharField(max_length=200)
     body = models.TextField()
@@ -15,8 +14,8 @@ class Myapp(models.Model):
 
 
 class Comment(models.Model):
- 
-    Myapp = models.ForeignKey(Myapp, on_delete=models.CASCADE, null=True, related_name='comments')
-    comment_user = models.CharField(max_length=200, null=True)
-    comment_date = models.DateTimeField(auto_now_add=True, null=True)
-    comment_textfield = models.TextField()
+    myapp= models.ForeignKey(Myapp, on_delete=models.CASCADE, related_name='comments')
+    text = models.TextField()
+    
+    def __str__(self):
+        return (self.author.username if self.author else "무명") + "의 댓글" 

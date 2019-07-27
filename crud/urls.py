@@ -19,6 +19,7 @@ from django.urls import path, include
 from django.conf import settings
 import myapp.views
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',myapp.views.home, name='home'),
@@ -27,6 +28,8 @@ urlpatterns = [
     path('myapp/new/', myapp.views.new, name='new'),
     path('myapp/create', myapp.views.create, name='create'),
     path('<int:pk>/delete/', myapp.views.delete, name='delete'),
+    path('<int:pk>/edit/', myapp.views.edit, name='edit'),
     path('accounts/', include('accounts.urls')),
-    path('post/<int:pk>', views.post, name="post"),
+
+
 ]

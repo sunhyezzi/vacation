@@ -77,4 +77,24 @@
 <p>작성 날짜 : {{myapp.update_date}}</p>
 <p> 자세한 본문 : {{myapp.body}}</p>
 <br>
+
+
+<hr>
+  <h5>댓글</h5>
+    <form action="{% url 'detail' myapp.id %}"  method = "POST">
+      {% csrf_token %}
+      <div class = "form-group">{{comment_form}}</div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+<hr>
+{% for comment in comments %}
+<div class = "container jumbotron">
+    <h5 class="mt-0">{{comment.text|linebreaksbr}}</h5>
+    <hr>
+</div>
+{% endfor %}
+
+
+<a href="{% url 'edit' pk=myapp.pk %}">글 수정하기</a>
+<br>
 <a href="{% url 'delete' pk=myapp.pk %}"> 삭제 </a>

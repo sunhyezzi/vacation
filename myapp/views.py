@@ -1,26 +1,33 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
-from .models import Myapp, Comment
-from .forms import  Create, MyappCommentForm
-from django.http import HttpResponseRedirect
-from django import forms
+from .models import Myapp
+from .forms import MyappForm
+from .models import Comment
+from .forms import CommentForm
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
+@login_required
 def home(request): 
     return render(request, 'home.html')
 
+@login_required
 def index(request):
-    myapps =Myapp.objects #쿼리셋
+    myapps =Myapp.objects.order_by('-id') #쿼리셋
     return render(request, 'index.html', {'myapps':myapps})
 
+@login_required
 def detail(request, myapp_id):
     myapp_detail = get_object_or_404(Myapp, pk = myapp_id )
     return render(request, 'detail.html', {'myapp':myapp_detail})
 
+
+@login_required
 def new(request): #new.html 띄워주는 함수
     return render(request, 'new.html')
 
+@login_required
 def create(request): #입력받은 내용을 데이터베이스에 넣어주는 함수
     myapp = Myapp()
     myapp.title = request.GET['title']
@@ -29,44 +36,41 @@ def create(request): #입력받은 내용을 데이터베이스에 넣어주는 
     myapp.save()
     return redirect('/myapp/' + str(myapp.id))
 
+@login_required
 def delete(request, pk):
         myapp = Myapp.objects.get(id=pk)
         myapp.delete()
         return redirect('index')
 
+@login_required
+def edit(request,pk):
+        myapp = get_object_or_404(Myapp, pk=pk)
 
-def comment(request, blog_id):
-    blog_detail = get_object_or_404(Myapp, pk = blog_id)
-    comments = Comment.objects.filter(blog_id=blog_id)
+        if request.method == "POST":
+                form = MyappForm(request.POST, instance=myapp)
+             
+                if form.is_valid():
+                        myapp = form.save(commit = False)
+                        myapp.update_date=timezone.now()
+                        myapp.save()
+                        return redirect('index')
+        else:
+                form = MyappForm(instance=myapp)
+                return render(request, 'edit.html', {'form': form})
 
-    if request.method == 'POST':
-        comment_form = MyappCommentForm(request.POST)
-        comment_form.instance.blog_id = blog_id
-        if comment_form.is_valid():
-            comment_form.save()
-  
-    else :
-        comment_form = MyappCommentForm()
 
-    context = {
-            'blog_detail' : blog_detail,
-            'comments': comments,
-            'comment_form': comment_form
-            
-    }
-    return render(request, 'myapp/index.html', context)
+def detail(request, myapp_id):
+        myapp = get_object_or_404(Myapp, pk=myapp_id)
+        
+        if request.method == "POST":
+                comment_form = CommentForm(request.POST)
+                comment_form.instance.myapp_id = myapp_id
+                
+                if comment_form.is_valid():
+                        comment = comment_form.save()
 
-def comment_delete(request, pk) :
-    comment = get_object_or_404(Comment, pk = pk)
-    comment.delete()
-    return redirect('home')
+        comment_form = CommentForm()
+        comments = myapp.comments.all()
 
-def comment_update(request, pk):
-    comment = get_object_or_404(Comment, pk = pk)
-    form = MyappCommentForm(request.POST, instance = comment)
-
-    if form.is_valid():
-        form.save()
-        return redirect('home')
-
-    return render(request, 'myapp/comment.html', {'form' : form})
+                       
+        return render(request, 'detail.html', {'myapp':myapp, 'comments':comments, 'comment_form':comment_form})
