@@ -1,1 +1,1 @@
-web: gunicorn crud.wsgi --log-file -
+web: gunicorn crudproject.wsgi --log-file -
